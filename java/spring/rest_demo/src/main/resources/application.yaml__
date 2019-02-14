@@ -1,0 +1,4 @@
+logging:
+  config:
+    org.springframework: INFO
+    org.springframework.web.servlet: DEBUG
