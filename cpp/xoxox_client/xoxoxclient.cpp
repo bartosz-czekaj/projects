@@ -44,7 +44,7 @@ public:
             const int ret = s.Read(&current, 1);
             if (ret <= 0) 
             {
-                std::cout << "disconnected";
+                printInfo("disconnected", TextType::TYPE_INFO);
                 return false;
             }
 
@@ -104,12 +104,30 @@ public:
 
 
 private:
+
+    enum class TextType
+    {
+        TYPE_ERROR = 1,
+        TYPE_WARNING = 2,
+        TYPE_INFO = 3
+    };
+
+
+    void printInfo(const std::string &text, TextType type)
+    {
+        const HANDLE con = GetStdHandle(STD_OUTPUT_HANDLE);
+        SetConsoleTextAttribute(con, FOREGROUND_GREEN | BACKGROUND_INTENSITY | BACKGROUND_BLUE);
+        std::cout << text<<'\n';
+    }
+
     wchar_t *convertCharArrayToLPCWSTR(const char* charArray)
     {
         wchar_t* wString = new wchar_t[4096];
         MultiByteToWideChar(CP_ACP, 0, charArray, -1, wString, 4096);
         return wString;
     }
+
+
 
     std::unique_ptr<DecompressedXP> s_circle;
     std::unique_ptr<DecompressedXP> s_cross;
@@ -120,6 +138,23 @@ private:
         img.Render(0, 0);
         SetConsoleTitle(convertCharArrayToLPCWSTR("Welcome to the xoxox game!"));
         getchar(); 
+    }
+
+    void drawPawn(std::string number)
+    {
+        rows_cols = std::atoi(number.c_str());
+        max_move = rows_cols * rows_cols;
+
+        s_circle->SetPalette();
+        s_cross->SetPalette();
+
+        const HANDLE con = GetStdHandle(STD_OUTPUT_HANDLE);
+        const COORD topleft = { 0, 0 };
+
+        SetConsoleCursorPosition(con, topleft);
+        DWORD num;
+        FillConsoleOutputCharacter(con, ' ', (25* rows_cols) * 38, topleft, &num);
+        FillConsoleOutputAttribute(con, BACKGROUND_BLUE, (25 * rows_cols) * 38, topleft, &num);
     }
 
     void  HandleShowBoard(NetSock &s) 
@@ -138,19 +173,7 @@ private:
                     ++delim_nbr;
                     if (delim_nbr == 1)
                     {
-                        rows_cols = std::atoi(number.c_str());
-                        max_move = rows_cols * rows_cols;
-
-                        s_circle->SetPalette();
-                        s_cross->SetPalette();
-
-                        HANDLE con = GetStdHandle(STD_OUTPUT_HANDLE);
-                        COORD topleft = { 0, 0 };
-
-                        SetConsoleCursorPosition(con, topleft);
-                        DWORD num;
-                        FillConsoleOutputCharacter(con, ' ', (25* rows_cols) * 38, topleft, &num);
-                        FillConsoleOutputAttribute(con, 1, (25 * rows_cols) * 38, topleft, &num);
+                        drawPawn(number);
 
                         continue;
                     }
@@ -208,7 +231,10 @@ private:
                 player += current;
             }
         }
-        std::cout << "player " << player << " turn\n";
+
+        std::string toshow = "player " + player + " turn";
+
+        printInfo("player " + player + " turn", TextType::TYPE_INFO);
     }
 
     void  HandleShowMoveErrorContinue(NetSock &s)
@@ -228,7 +254,7 @@ private:
             }
         }
 
-        std::cout << "error error wrong move (continue) player " << player << '\n';
+        printInfo("error error wrong move (continue) player " + player, TextType::TYPE_ERROR);
     }
 
 
@@ -249,7 +275,7 @@ private:
             }
         }
 
-        std::cout << "error error wrong move player "<<player<<'\n';
+        printInfo("error error wrong move player ", TextType::TYPE_ERROR);
     }
 
     void  HandleShowWinner(NetSock &s) 
@@ -269,12 +295,12 @@ private:
             }
         }
 
-        std::cout << "player "<<player<<" won\n";
+        printInfo("player " + player + " won", TextType::TYPE_INFO);
     }
 
     void  HandleShowDraw() 
     {
-        std::cout<<"draw!\n";
+        printInfo("draw!", TextType::TYPE_INFO);
     }
 
     void  HandleGetMoveRequest(NetSock &s) 
@@ -282,8 +308,7 @@ private:
         int move = 0;
         while (true)
         {
-            std::cout << "your move !\n";
-
+            printInfo("your move!", TextType::TYPE_INFO);
             
             std::cin >> move;
 
@@ -302,8 +327,6 @@ private:
     }
 };
 
-//int XoXoXo::max_move = 0;
-
 static PaletteArchiver *g_pa;
 
 BOOL WINAPI CtrlCHandler(DWORD /*dwCtrlType*/) {
@@ -315,7 +338,6 @@ void usage();
 
 int main(int argc, char **argv) 
 {
-   
     PaletteArchiver pa;
     g_pa = &pa;
     SetConsoleCtrlHandler(CtrlCHandler, TRUE);
@@ -331,7 +353,7 @@ int main(int argc, char **argv)
     {
         port = std::stoi(argv[2]);
     }
-    catch (std::invalid_argument)
+    catch (const std::invalid_argument)
     {
         usage();
         return -2;
