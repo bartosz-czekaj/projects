@@ -1,0 +1,14 @@
+{
+  "ProjectFilePath": "/home/juzwa/projects/net_core/Actio/tests/Actio.Services.Activities.Tests/Actio.Services.Activities.Tests.csproj",
+  "TargetFramework": "netcoreapp2.2",
+  "TagHelpers": [],
+  "Configuration": {
+    "ConfigurationName": "UnsupportedRazor",
+    "LanguageVersion": "1.0",
+    "Extensions": [
+      {
+        "ExtensionName": "UnsupportedRazorExtension"
+      }
+    ]
+  }
+}
