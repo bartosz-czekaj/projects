@@ -1,0 +1,26 @@
+version: "3.5"
+services:
+  consul:
+    image: consul
+    container_name: consul
+    ports:
+      - 8500:8500
+    networks:
+      - samplenetwork
+    # network_mode: host
+    volumes:
+      - consul:/consul/data
+  fabio:
+    image: fabiolb/fabio
+    container_name: fabio
+    environment:
+    - FABIO_REGISTRY_CONSUL_ADDR=consul:8500
+    networks:
+      - samplenetwork
+    # network_mode: host
+    ports:
+    - 9998:9998
+    - 9999:9999
+ 
+networks:
+  samplenetwork:
