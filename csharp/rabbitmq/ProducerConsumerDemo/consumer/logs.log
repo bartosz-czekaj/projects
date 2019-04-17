@@ -1,0 +1,15 @@
+
+Permission denied to modify the '/usr/share/dotnet/sdk/NuGetFallbackFolder' folder.
+
+Here are some options to fix this error:
+----------------------------------------
+1. Re-run this command with elevated access.
+2. Disabled the first run experience by setting the environment variable DOTNET_SKIP_FIRST_TIME_EXPERIENCE to true.
+3. Copy the .NET Core SDK to a non-protected location and use it from there.
+    
+ [*] Waiting for logs.
+ Press [enter] to exit.
+ [x] info: Hello World!
+ [x] info: Hello World!
+ [x] info: Hello World!
+ [x] dupa jas pierdzi stas
